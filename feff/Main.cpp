@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <math.h> 				// sqrt
 #include <string>
 #include <fstream>				// ifstream
 #include <sstream>				// for ostream
@@ -642,130 +643,45 @@ void addToListOfAtoms(set<int>& aset, stringstream& s, int type, int number, str
 
 }
 
+/**
+ * copies bigBox points to ANNpointArray datapoints
+ */
+void copyBigBoxPoints(vector<point> &ext_box, ANNpointArray &dataPts)	{
+	vector<point>::iterator bigBox_iter;
 
-int main(int argc, char **argv)	{
+	//	ofstream big;	// for debugging
+	//	big.open("bigpt.txt");	// for debugging
 
-//	char filename[] = "MD-data";
-//	char queryFilename[] = "query.txt";		// for debugging
-//	char outputFilename[] = "feff";
+		// copy all the points in bigBox vector to dataPts
+		//copyBigBoxPoints(ext_box, dataPts);
+		int i=0;
+		for (bigBox_iter = ext_box.begin(); bigBox_iter != ext_box.end(); bigBox_iter++ )	{
+			readPt(*bigBox_iter,dataPts[i]);		// copying the pt to dataPts
+	//		printPt(big,dataPts[i]);	//for debugging
+			i++;
+		}
+	//	big.close();	// for debugging
+}
 
+/**
+ * prints the distances of the atoms within the given radius
+ */
+void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> &ext_box, int radius)	{
+	vector<point>::iterator query_iter;
 
-//	char bigFilename[] = "big-data.txt";	// for debugging
-
-	vector<point> box;	// vector of all points calling it a box
-
-	vector<string> periodicTable = readPeriodicTable();
-
-	ANNpointArray		dataPts;				// data points
 	ANNpoint			queryPt;				// query point
 	ANNidxArray			nnIdx;					// near neighbor indices
 	ANNdistArray		dists;					// near neighbor distances
-	ANNkd_tree*			kdTree;					// search structure
 
-	MinMax mm;									// object contain Min Max information of points
-
-	vector<vector<point> > group_box;			// to store group of small boxes
-
-	getArgs(argc, argv);						// read command-line arguments
-
-	box = readFile(inputFilename);					// read the input file and populate the box
-	//printPoints(box);	// for debugging
-
-	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
-
-//	cout << "xmax : " << mm.xmax << " idx = "<< mm.xmax_idx << endl;
-//	printPoint(box[mm.xmax_idx]);
-//	cout << "xmin : " << mm.xmin << " idx = "<< mm.xmin_idx << endl;
-//	printPoint(box[mm.xmin_idx]);
-//	cout << "ymax : " << mm.ymax << " idx = "<< mm.ymax_idx << endl;
-//	printPoint(box[mm.ymax_idx]);
-//	cout << "ymin : " << mm.ymin << " idx = "<< mm.ymin_idx << endl;
-//	printPoint(box[mm.ymin_idx]);
-//	cout << "zmax : " << mm.zmax << " idx = "<< mm.zmax_idx << endl;
-//	printPoint(box[mm.zmax_idx]);
-//	cout << "zmin : " << mm.zmin << " idx = "<< mm.zmin_idx << endl;
-//	printPoint(box[mm.zmin_idx]);
-
-	// computes the dx, dy and dz
-	double dx = mm.xmax - mm.xmin;
-	double dy = mm.ymax - mm.ymin;
-	double dz = mm.zmax - mm.zmin;
-
-//	cout << "dx= " << dx << endl;	// for debugging
-//	cout << "dy= " << dy << endl;	// for debugging
-//	cout << "dz= " << dz << endl;	// for debugging
-
-	// partitions the box into 8 small boxes
-	Find_Small_boxes(box,group_box,mm,dx,dy,dz);
-	//cout << "group_box size: " << group_box.size() << endl;
-	//printGPbox(group_box);		// for debugging
-
-	//After wrapping the box all around symmetrically, the size of points increases to 8 times the original
-	vector<point> ext_box;	// larger box which also contains the points of neighboring boxes as well
-
-	//ofstream bigFile;			// for debugging
-	//bigFile.open(bigFilename);	// for debugging
-
-	fillBigBox(group_box, ext_box, dx, dy, dz);	// fills the larger box with values
-	//printPointlist(bigFile,ext_box);		// for debugging
-	//bigFile.close(); 						// for debugging
-
-	int bigBoxSize = ext_box.size();	// size of the big box
-	cout << "filled big box of size :" << ext_box.size() << endl;
-
-	displayAtomlist();	// displays the list of atoms present in the input
-
-	int choice;			// atom number for neighborhood search
-	double radius;		// radius in which search is made
-
-	cout << "size of the box : " << box.size() << endl;
-
-	cout << "Enter the atom number to search for neighborhood : ";
-	cin >> choice;
-
-	cout << "Enter the radius to search: ";
-	cin >> radius;
-
-	vector<point> querylist;
-
-//	ofstream queryFile;		// for debugging
-//	queryFile.open(queryFilename);	// for debugging
-
-	constructQuerylist(box,choice,querylist);	// construct querylist from choice
-//	printPointlist(queryFile , querylist);	// prints all the query points in file for debugging
+	vector<string> periodicTable = readPeriodicTable();
 
 	queryPt = annAllocPt(dim);					// allocate query point with 'dim' dimensions
-	dataPts = annAllocPts(bigBoxSize, dim);		// allocate array of data points
-
-	vector<point>::iterator bigBox_iter;
-
-//	ofstream big;	// for debugging
-//	big.open("bigpt.txt");	// for debugging
-
-	// copy all the points in bigBox vector to dataPts
-	int i=0;
-	for (bigBox_iter = ext_box.begin(); bigBox_iter != ext_box.end(); bigBox_iter++ )	{
-		readPt(*bigBox_iter,dataPts[i]);		// copying the pt to dataPts
-//		printPt(big,dataPts[i]);	//for debugging
-		i++;
-	}
-//	big.close();	// for debugging
-	cout << "Read AnnPoints " << endl;
-
-	kdTree = new ANNkd_tree(					// build search structure
-						dataPts,				// the data points
-						bigBoxSize,				// number of points
-						dim);					// dimension of space
-	cout << "kdTree built " << endl;
-
-	vector<point>::iterator query_iter;
 
 	nnIdx = NULL;
 	dists = NULL;
 
 	ofstream out;
 	int fileno = 0;
-	//out.open(outputFilename);
 
 	// get each point from the query list and finds the neighborhood
 	for (query_iter = querylist.begin(); query_iter != querylist.end(); query_iter++ )	{
@@ -861,6 +777,109 @@ int main(int argc, char **argv)	{
 	}
 
 	cout << "Read query Points " << endl;
+}
+
+int main(int argc, char **argv)	{
+
+//	char filename[] = "MD-data";
+//	char queryFilename[] = "query.txt";		// for debugging
+//	char outputFilename[] = "feff";
+
+
+//	char bigFilename[] = "big-data.txt";	// for debugging
+
+	vector<point> box;	// vector of all points calling it a box
+
+	ANNpointArray		dataPts;				// data points
+	ANNkd_tree*			kdTree;					// search structure
+
+	MinMax mm;									// object contain Min Max information of points
+
+	vector<vector<point> > group_box;			// to store group of small boxes
+
+	getArgs(argc, argv);						// read command-line arguments
+
+	box = readFile(inputFilename);					// read the input file and populate the box
+	//printPoints(box);	// for debugging
+
+	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
+
+//	cout << "xmax : " << mm.xmax << " idx = "<< mm.xmax_idx << endl;
+//	printPoint(box[mm.xmax_idx]);
+//	cout << "xmin : " << mm.xmin << " idx = "<< mm.xmin_idx << endl;
+//	printPoint(box[mm.xmin_idx]);
+//	cout << "ymax : " << mm.ymax << " idx = "<< mm.ymax_idx << endl;
+//	printPoint(box[mm.ymax_idx]);
+//	cout << "ymin : " << mm.ymin << " idx = "<< mm.ymin_idx << endl;
+//	printPoint(box[mm.ymin_idx]);
+//	cout << "zmax : " << mm.zmax << " idx = "<< mm.zmax_idx << endl;
+//	printPoint(box[mm.zmax_idx]);
+//	cout << "zmin : " << mm.zmin << " idx = "<< mm.zmin_idx << endl;
+//	printPoint(box[mm.zmin_idx]);
+
+	// computes the dx, dy and dz
+	double dx = mm.xmax - mm.xmin;
+	double dy = mm.ymax - mm.ymin;
+	double dz = mm.zmax - mm.zmin;
+
+//	cout << "dx= " << dx << endl;	// for debugging
+//	cout << "dy= " << dy << endl;	// for debugging
+//	cout << "dz= " << dz << endl;	// for debugging
+
+	// partitions the box into 8 small boxes
+	Find_Small_boxes(box,group_box,mm,dx,dy,dz);
+	//cout << "group_box size: " << group_box.size() << endl;
+	//printGPbox(group_box);		// for debugging
+
+	//After wrapping the box all around symmetrically, the size of points increases to 8 times the original
+	vector<point> ext_box;	// larger box which also contains the points of neighboring boxes as well
+
+	//ofstream bigFile;			// for debugging
+	//bigFile.open(bigFilename);	// for debugging
+
+	fillBigBox(group_box, ext_box, dx, dy, dz);	// fills the larger box with values
+	//printPointlist(bigFile,ext_box);		// for debugging
+	//bigFile.close(); 						// for debugging
+
+	int bigBoxSize = ext_box.size();	// size of the big box
+	cout << "filled big box of size :" << ext_box.size() << endl;
+
+	displayAtomlist();	// displays the list of atoms present in the input
+
+	int choice;			// atom number for neighborhood search
+	double radius;		// radius in which search is made
+
+	cout << "size of the box : " << box.size() << endl;
+
+	cout << "Enter the atom number to search for neighborhood : ";
+	cin >> choice;
+
+	cout << "Enter the radius to search: ";
+	cin >> radius;
+
+	vector<point> querylist;
+
+//	ofstream queryFile;		// for debugging
+//	queryFile.open(queryFilename);	// for debugging
+
+	constructQuerylist(box,choice,querylist);	// construct querylist from choice
+//	printPointlist(queryFile , querylist);	// prints all the query points in file for debugging
+
+	dataPts = annAllocPts(bigBoxSize, dim);		// allocate array of data points
+
+//	copy all the points in bigBox vector to dataPts
+	copyBigBoxPoints(ext_box, dataPts);
+
+	cout << "Read AnnPoints " << endl;
+
+	kdTree = new ANNkd_tree(					// build search structure
+						dataPts,				// the data points
+						bigBoxSize,				// number of points
+						dim);					// dimension of space
+	cout << "kdTree built " << endl;
+
+	printDistances(querylist, kdTree, ext_box, radius);	// prints the distances of the atoms within the given radius
+
 	delete kdTree;								// delete the kdTree
 	annClose();									// done with ANN
 
