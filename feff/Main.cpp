@@ -16,6 +16,7 @@
 #include <cstring>				// string manipulation
 #include <limits>
 #include <stdlib.h>
+#include <ctype.h>				// tolower
 #include <algorithm>			// for find
 #include <iomanip>  			// for setw
 #include <set>
@@ -97,6 +98,73 @@ vector<string> readPeriodicTable()	{
 		cout << "could not open the file";
 	return atom_list;
 }
+/**
+ * loads the R values from R-values.txt from text and populate a map
+ */
+map<string,vector<float> > loadRValues()	{
+	ifstream infile("R-values.txt");
+	string line;
+
+	map< string,vector<float> > Rmap;
+
+	if (infile.is_open()){
+		while( getline( infile, line ) )	{
+			std::istringstream iss (line);
+
+			string atomNotation;
+			float val;
+			vector<float> Rvals;
+			iss >> atomNotation;
+			//cout << atomNotation;
+			while ( !iss.eof() )	{
+				iss >> val;
+				//cout << " " << val;
+				Rvals.push_back(val);
+			}
+			//cout << endl;
+			Rmap[atomNotation] = Rvals;
+		}
+	}
+	else
+		cout << "could not open the file";
+
+	return Rmap;
+}
+
+float getRValues(map<string,vector<float> > Rmap, string atom)	{
+	vector<float> vals;
+	float RVal;
+	map<string,vector<float> > :: iterator Rmap_iter;
+	Rmap_iter = Rmap.find(atom);
+	if ( Rmap_iter != Rmap.end() )	{
+		vals = Rmap_iter->second;
+	}
+	if (vals.size() > 1)	{
+		cout << atom << " has more than one value. Choose one from below " << endl;
+		cout << "index \t Atom \t R-val" << endl;
+		int i = 1;
+		vector<float>::iterator val_iter;
+		vector<float> RVals;
+		for (val_iter = vals.begin();val_iter != vals.end(); val_iter++)	{
+			cout << i++ << "\t";
+			cout << atom << *val_iter++ << "\t";
+			RVals.push_back(*val_iter);
+			cout << *val_iter << endl;
+
+		}
+		int idx;
+		cout << "Enter the index : ";
+		cin >> idx;
+		//cout << "Corresponding R Value " << RVals[idx-1] << endl;
+		RVal = RVals[idx-1];
+
+	} else
+		RVal = *vals.begin();
+
+	//cout << "values in the Mn" << endl;
+
+	return RVal;
+}
 
 /**
  * reads the input points from a file and return as a vector of points
@@ -130,7 +198,7 @@ vector<point> readFile(char*  fp)	{
 				iss >> type;
 				iss >> atom;
 
-				if (atom_list.find(type) == atom_list.end())
+				if (atom_list.find(type) == atom_list.end())	// add unique atom values to atom_list map
 					atom_list[type]=atom;
 
 				point p(convertToDouble(x_coord),convertToDouble(y_coord),convertToDouble(z_coord), type);
@@ -224,19 +292,6 @@ void find_MinMax(const vector<point>& vp, MinMax& m)	{
 	}
 }
 
-//bool check_point_in_box(const point& p, double llx, double lly, double llz, double urx, double ury, double urz, bool check_bottom_left)	{
-//	bool point_in_box = false;
-//	if (check_bottom_left)	{
-//		if ( (p.x >= llx ) && (p.y >= lly) && (p.z >= llz) && (p.x <= urx) && (p.y <= ury) && (p.z <= urz) )
-//			point_in_box = true;
-//	}
-//	else	{
-//		if ( (p.x > llx ) && (p.y > lly) && (p.z > llz) && (p.x <= urx) && (p.y <= ury) && (p.z <= urz) )
-//			point_in_box = true;
-//	}
-//	return point_in_box;
-//}
-
 /**
  * splits the box into 8 small boxes.
  *
@@ -306,9 +361,9 @@ void Find_Small_boxes(const vector<point>& vp, vector<vector<point> >& gp_box, c
 /**
  * prints point object
  */
-void printPoint(point p)	{
+void printPoint(ostream &out, point p)	{
 
-	cout << p.x << " " << p.y << " " << p.z << endl;
+	out << p.x << " " << p.y << " " << p.z << endl;
 }
 
 /**
@@ -583,19 +638,44 @@ void displayAtomlist()	{
 }
 
 /**
+ * structure to store the min, max and their respective positions
+ */
+struct queryPoint	{
+	int lineNo;
+	point qpoint;
+};
+
+/**
  * constructs querylist from choice
  *
  * @param point_list [in]		list of points
  * @param choice [in]			choice of atom for query
  * @param query_list [out]		constructed querylist from point_list using choice
  */
-void constructQuerylist(vector<point>& point_list, int choice, vector<point>& query_list )	{
+void constructQuerylist(vector<point>& point_list, int choice, vector<queryPoint> & query_list )	{
 	vector<point>:: iterator point_list_itr;
 
+	//ofstream qFile;					// for debugging
+	//qFile.open("querylist.txt");		// for debugging
+
+	int i = 1;
 	for(point_list_itr=point_list.begin(); point_list_itr != point_list.end(); point_list_itr++)	{
-		if (point_list_itr->type == choice)
-			query_list.push_back(*point_list_itr);
+
+		if (point_list_itr->type == choice)	{
+			queryPoint qp;
+			qp.lineNo = point_list_itr - point_list.begin();
+			qp.qpoint = *point_list_itr;
+			query_list.push_back(qp);
+
+			//qFile << "temp" << endl;
+//			qFile << qp.lineNo << " ";
+//			printPoint(qFile, qp.qpoint);
+//			qFile << endl;
+
+		}
+		i++;
 	}
+//	qFile.close();
 }
 
 /**
@@ -666,8 +746,9 @@ void copyBigBoxPoints(vector<point> &ext_box, ANNpointArray &dataPts)	{
 /**
  * prints the distances of the atoms within the given radius
  */
-void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> &ext_box, int radius)	{
-	vector<point>::iterator query_iter;
+void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<point> &ext_box, double radius, int coordType, float coordDist, float Rval)	{
+
+	vector<queryPoint>::iterator query_iter;
 
 	ANNpoint			queryPt;				// query point
 	ANNidxArray			nnIdx;					// near neighbor indices
@@ -680,12 +761,23 @@ void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> 
 	nnIdx = NULL;
 	dists = NULL;
 
-	ofstream out;
+	ofstream out, outbv;	// outbv for writing bond Valence into file
 	int fileno = 0;
+	stringstream st;		// string stream to output all the bond valence and coordination number for all the query atoms
+	st.precision(5);		// set the precision of stream t to 5
 
+	if (Rval > 0 )	{	// when bond valence needs to be computed
+		string str(outputFilenameDist);
+		string outbvFilename = str + "_bondVal.txt";
+		char outbvfile[40];							// char array variable to store output file name
+		strcpy(outbvfile, outbvFilename.c_str() ); 	// convert the string to char array
+		outbv.open(outbvfile);						// opens the bond valence output file
+
+		st << "row#\tAtom\tCN\tBV" << "\n";
+	}
 	// get each point from the query list and finds the neighborhood
 	for (query_iter = querylist.begin(); query_iter != querylist.end(); query_iter++ )	{
-		readPt(*query_iter,queryPt);	// reads the query point from query_iter to queryPt
+		readPt(query_iter->qpoint,queryPt);	// reads the query point from query_iter and copy to queryPt
 		string out_file = outputFilenameDist + static_cast<ostringstream*>( &(ostringstream() << fileno++ ) )->str() + ".inp"; // convert fileno to string and concatenate
 
 		//cout << out_file << endl;	// for debugging
@@ -728,10 +820,14 @@ void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> 
 		stringstream t;		// string stream to output all the atoms with distances in the neighborhood
 		t.precision(5);		// set the precision of stream t to 5
 
+		float bondVal = 0.0;	// bond valence of coordination type
+		int coordNum = 0;		// coordination number of coordination type
+
+		string queryAtomName="";	// name of the query atom
 
 		for (int i = 0; i < k; i++) {			// for each atom in the querylist, prints the neighbors and its distances
 			dists[i] = sqrt(dists[i]);			// unsquare distance
-			point pt = ext_box[nnIdx[i]];
+			point pt = ext_box[nnIdx[i]];		// nnIdx[i] points to neighbor in ext_box
 
 			// populate the list of unique atoms, present in the neighborhood
 			string atom_name = "";
@@ -739,16 +835,27 @@ void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> 
 			if ( atom_iter != atom_list.end() )
 				atom_name = atom_iter->second;
 
+			if (Rval > 0)	{	// compute coordination number and valence
+				if ( (pt.type == coordType) && (dists[i] <= coordDist) )	{	// we have got the coordination atom
+					if ( ( atom_name == "Ti" ) && (dists[i] >= 1.84 )	)	{	// second case for 'Ti' otherwise the R value of Ti = 1.89
+						Rval = 1.815;
+					}
+					float bv = exp( ( Rval - dists[i] ) / 0.37 );
+					bondVal += bv;
+					coordNum++ ;
+				}
+			}
+
 			// lookup the atomic number from the periodic table
 			int atomic_number = lookupAtomicNumber(atom_name, periodicTable);
 			//cout << "atomic number"<< atomic_number << " Notation: " << atom_name << endl;
 
 			if (i==0)	{	// the query atom
-
+				queryAtomName = atom_name;
 				s << "\t0" << "\t" << atomic_number << "\t" << atom_name << endl;
-				t << " \t" << fixed << setw(15) << pt.x - query_iter->x;
-				t << fixed << setw(15) << pt.y - query_iter->y;
-				t << fixed << setw(15)<< pt.z - query_iter->z;
+				t << " \t" << fixed << setw(15) << pt.x - query_iter->qpoint.x;
+				t << fixed << setw(15) << pt.y - query_iter->qpoint.y;
+				t << fixed << setw(15)<< pt.z - query_iter->qpoint.z;
 				t << setw(15) << "0";
 				t << setw(4) << atom_name ;
 				t << setw(15) << dists[i] << "\n";
@@ -756,14 +863,20 @@ void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> 
 			else	{	// neighbors of the query atom
 
 				addToListOfAtoms(atom_set,s,pt.type,atomic_number,atom_name);	// add unique atoms to a list
-				t << " \t" << fixed << setw(15) << pt.x - query_iter->x;
-				t << fixed << setw(15) << pt.y - query_iter->y;
-				t << fixed << setw(15) << pt.z - query_iter->z;
+				t << " \t" << fixed << setw(15) << pt.x - query_iter->qpoint.x;
+				t << fixed << setw(15) << pt.y - query_iter->qpoint.y;
+				t << fixed << setw(15) << pt.z - query_iter->qpoint.z;
 				t << setw(15) << pt.type;
 				t << setw(4) << atom_name;
 				t << setw(15) << dists[i] << "\n";
 			}
 		}
+
+		if (Rval > 0)	{
+			st << query_iter->lineNo << "\t" << queryAtomName << "\t" << coordNum << "\t" <<bondVal << "\n";
+
+		}
+
 		atom_set.clear();		// empty the set
 		out << s.str() << endl << endl << endl;		// prints the unique atom list
 		out << "ATOMS" << endl;
@@ -775,20 +888,73 @@ void printDistances(vector<point> &querylist, ANNkd_tree* kdTree, vector<point> 
 		delete [] dists;
 		out.close();								// close the output file
 	}
-
+	if (Rval > 0)	{
+		outbv << st.str();
+		outbv.flush();
+		outbv.close();
+	}
 	cout << "Read query Points " << endl;
+}
+
+/**
+ * takes the input from the user
+ */
+void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &coordDist, float &RVal)	{
+	char continueValence; 	// y/n choice to continue calculating valence
+	bool correctEntry = false;		// check whether entered the right choice
+
+	do {		// iterates till get the right entry
+		cout << "Enter the atom number to search for neighborhood : ";
+			cin >> atomChoice;
+
+		map <int,string>:: iterator atom_iter = atom_list.find(atomChoice);
+		if ( atom_iter != atom_list.end() )
+			correctEntry = true;
+		else
+			cout << "Wrong Entry" << endl << "Again ";
+	} while (!correctEntry);
+
+	cout << "Enter the radius to search: ";
+	cin >> radius;
+
+	cout << "Would you like to calculate bond valence (y)es/n(o)? ";
+	cin >> continueValence;
+
+	if (tolower(continueValence) == 'y')	{
+
+		map<int,string>::iterator atom_list_itr = atom_list.find(atomChoice);
+		string atomNotation = atom_list_itr->second;
+
+		map<string, vector <float> > RMap = loadRValues();		// loads the R values from the file
+
+		correctEntry = false;		// check whether entered the right choice
+		do {		// iterates till get the right entry
+			cout << "Enter the coordination atom from the index: ";
+			cin >> coordAtomChoice;
+
+			map <int,string>:: iterator atom_iter = atom_list.find(coordAtomChoice);
+			if ( atom_iter != atom_list.end() )
+				correctEntry = true;
+			else
+				cout << "Wrong Entry" << endl << "Again ";
+		} while (!correctEntry);
+
+		cout << "Enter the coordination distance: ";
+		cin >> coordDist;
+
+		RVal = getRValues(RMap,atomNotation);
+		cout << "Rval = " << RVal << endl;
+//		int temp;
+//		cin >> temp;
+	}
 }
 
 int main(int argc, char **argv)	{
 
-//	char filename[] = "MD-data";
 //	char queryFilename[] = "query.txt";		// for debugging
-//	char outputFilename[] = "feff";
-
-
 //	char bigFilename[] = "big-data.txt";	// for debugging
 
-	vector<point> box;	// vector of all points calling it a box
+	vector<point> box;							// vector of all points calling it a box
 
 	ANNpointArray		dataPts;				// data points
 	ANNkd_tree*			kdTree;					// search structure
@@ -799,8 +965,11 @@ int main(int argc, char **argv)	{
 
 	getArgs(argc, argv);						// read command-line arguments
 
-	box = readFile(inputFilename);					// read the input file and populate the box
-	//printPoints(box);	// for debugging
+	box = readFile(inputFilename);				// read the input file and populate the box
+
+//	ofstream dataFile;				// for debugging
+//	dataFile.open("datafile.txt");		// for debugging
+//	printPointlist(dataFile,box);	// for debugging
 
 	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
 
@@ -828,41 +997,47 @@ int main(int argc, char **argv)	{
 
 	// partitions the box into 8 small boxes
 	Find_Small_boxes(box,group_box,mm,dx,dy,dz);
-	//cout << "group_box size: " << group_box.size() << endl;
-	//printGPbox(group_box);		// for debugging
+//	cout << "group_box size: " << group_box.size() << endl;	// for debugging
+//	printGPbox(group_box);									// for debugging
 
 	//After wrapping the box all around symmetrically, the size of points increases to 8 times the original
 	vector<point> ext_box;	// larger box which also contains the points of neighboring boxes as well
 
-	//ofstream bigFile;			// for debugging
-	//bigFile.open(bigFilename);	// for debugging
+//	ofstream bigFile;				// for debugging
+//	bigFile.open(bigFilename);		// for debugging
 
 	fillBigBox(group_box, ext_box, dx, dy, dz);	// fills the larger box with values
-	//printPointlist(bigFile,ext_box);		// for debugging
-	//bigFile.close(); 						// for debugging
+//	printPointlist(bigFile,ext_box);		// for debugging
+//	bigFile.close(); 						// for debugging
 
 	int bigBoxSize = ext_box.size();	// size of the big box
-	cout << "filled big box of size :" << ext_box.size() << endl;
+	//cout << "filled big box of size :" << ext_box.size() << endl;	// for debugging
 
 	displayAtomlist();	// displays the list of atoms present in the input
 
-	int choice;			// atom number for neighborhood search
-	double radius;		// radius in which search is made
+	int atomChoice;			// atom number for neighborhood search
+	double radius;			// radius in which search is made
 
-	cout << "size of the box : " << box.size() << endl;
+	int coordAtomChoice = 0;	// coordination atom choice
+	float coordDist = 0.0;			// coordination distance
 
-	cout << "Enter the atom number to search for neighborhood : ";
-	cin >> choice;
+	//cout << "size of the box : " << box.size() << endl;			// for debugging
+	float RVal = 0.0;
 
-	cout << "Enter the radius to search: ";
-	cin >> radius;
+	takesInput (atomChoice, radius, coordAtomChoice, coordDist, RVal);		// takes the input from the user
 
-	vector<point> querylist;
+	cout << "RVal = " << RVal << endl;
+
+//	int temp;
+//	cin >> temp;
+
+	vector<queryPoint> querylist;
+	//vector<point> querylist;
 
 //	ofstream queryFile;		// for debugging
 //	queryFile.open(queryFilename);	// for debugging
 
-	constructQuerylist(box,choice,querylist);	// construct querylist from choice
+	constructQuerylist(box,atomChoice,querylist);	// construct querylist from atomChoice
 //	printPointlist(queryFile , querylist);	// prints all the query points in file for debugging
 
 	dataPts = annAllocPts(bigBoxSize, dim);		// allocate array of data points
@@ -878,7 +1053,7 @@ int main(int argc, char **argv)	{
 						dim);					// dimension of space
 	cout << "kdTree built " << endl;
 
-	printDistances(querylist, kdTree, ext_box, radius);	// prints the distances of the atoms within the given radius
+	printDistances(querylist, kdTree, ext_box, radius, coordAtomChoice, coordDist, RVal);	// prints the distances of the atoms within the given radius
 
 	delete kdTree;								// delete the kdTree
 	annClose();									// done with ANN
@@ -934,10 +1109,6 @@ void getArgs(int argc, char **argv)
 		}
 		i++;
 	}
-//	cout << "InputFile " << inputFilename << endl;
-//	cout << "Output Distance File " << outputFilenameDist << endl;
-//	cout << "Output Valence File " << outputFilenameVal << endl;
-
 
 }
 
