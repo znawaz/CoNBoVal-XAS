@@ -36,8 +36,8 @@ double			eps	= 0;			// error bound
 //	Parameters that are set in getArgs()
 //----------------------------------------------------------------------
 char inputFilename[40];
-char outputFilenameDist[40];
-char outputFilenameVal[40];
+char outputFilenameDist[40];	// prefix name for the file storing distances
+char outputFilenameVal[40];		// file name for storing bond valence and coordination number
 
 void getArgs(int argc, char **argv);			// get command-line arguments
 
@@ -53,7 +53,8 @@ string myreplace(string &s, string toReplace,string replaceWith)
 	return s;
 }
 /**
- * takes a number as string and convert to double
+ * takes a number as string and convert to double.
+ * Furthermore, in the input file, the exponent is written with D, so it replaces D with E.
  */
 double convertToDouble(string str)	{
 	myreplace(str,"D","E");
@@ -63,7 +64,7 @@ double convertToDouble(string str)	{
 }
 
 /**
- * print header to every output file
+ * print header to every output distance file
  */
 void printHeader(ostream &out)	{
 	out << "* This feff input file was generated personal program based on Molecular Dynamic model" << endl;
@@ -99,7 +100,7 @@ vector<string> readPeriodicTable()	{
 	return atom_list;
 }
 /**
- * loads the R values from R-values.txt from text and populate a map
+ * loads the R values from "R-values.txt" and populate a map
  */
 map<string,vector<float> > loadRValues()	{
 	ifstream infile("R-values.txt");
@@ -131,6 +132,16 @@ map<string,vector<float> > loadRValues()	{
 	return Rmap;
 }
 
+/**
+ * returns the R value for the input atom.
+ * if the atom has more than one R values, it gives user the option to
+ * choose the appropriate value.
+ *
+ * @param Rmap [in]		map which stores the name of atom and corresponding R value(s).
+ * @param atom [in]		name of the atom ("Mn") to look up the R value
+ * @return				R value for the given atom
+ *
+ */
 float getRValues(map<string,vector<float> > Rmap, string atom)	{
 	vector<float> vals;
 	float RVal;
@@ -160,8 +171,6 @@ float getRValues(map<string,vector<float> > Rmap, string atom)	{
 
 	} else
 		RVal = *vals.begin();
-
-	//cout << "values in the Mn" << endl;
 
 	return RVal;
 }
@@ -216,8 +225,12 @@ vector<point> readFile(char*  fp)	{
 
 	return vp;
 }
+
 /**
- * prints the list of points
+ * prints the list of points to screen or file
+ *
+ * @param out [in]		output stream to write to
+ * @param vp [in]		vector of points to be printed
  */
 void printPointlist(ostream &out, const vector<point>& vp)	{
 	unsigned int size = vp.size();
@@ -339,15 +352,6 @@ void Find_Small_boxes(const vector<point>& vp, vector<vector<point> >& gp_box, c
 
 	}
 
-//	cout << "size of b0: " << b0.size() << endl;
-//	cout << "size of b1: " << b1.size() << endl;
-//	cout << "size of b2: " << b2.size() << endl;
-//	cout << "size of b3: " << b3.size() << endl;
-//	cout << "size of b4: " << b4.size() << endl;
-//	cout << "size of b5: " << b5.size() << endl;
-//	cout << "size of b6: " << b6.size() << endl;
-//	cout << "size of b7: " << b7.size() << endl;
-
 	gp_box.push_back(b0);
 	gp_box.push_back(b1);
 	gp_box.push_back(b2);
@@ -359,7 +363,7 @@ void Find_Small_boxes(const vector<point>& vp, vector<vector<point> >& gp_box, c
 
 }
 /**
- * prints point object
+ * prints point object to output stream either file or screen
  */
 void printPoint(ostream &out, point p)	{
 
@@ -367,7 +371,7 @@ void printPoint(ostream &out, point p)	{
 }
 
 /**
- * print ANNpoint object
+ * print ANNpoint object to output stream either file or screen
  *
  * @param out [in]	object of outputstream
  * @param p [in]	object of ANNpoint
@@ -663,15 +667,9 @@ void constructQuerylist(vector<point>& point_list, int choice, vector<queryPoint
 
 		if (point_list_itr->type == choice)	{
 			queryPoint qp;
-			qp.lineNo = point_list_itr - point_list.begin();
+			qp.lineNo = point_list_itr - point_list.begin()+1;
 			qp.qpoint = *point_list_itr;
 			query_list.push_back(qp);
-
-			//qFile << "temp" << endl;
-//			qFile << qp.lineNo << " ";
-//			printPoint(qFile, qp.qpoint);
-//			qFile << endl;
-
 		}
 		i++;
 	}
@@ -729,22 +727,27 @@ void addToListOfAtoms(set<int>& aset, stringstream& s, int type, int number, str
 void copyBigBoxPoints(vector<point> &ext_box, ANNpointArray &dataPts)	{
 	vector<point>::iterator bigBox_iter;
 
-	//	ofstream big;	// for debugging
-	//	big.open("bigpt.txt");	// for debugging
-
 		// copy all the points in bigBox vector to dataPts
 		//copyBigBoxPoints(ext_box, dataPts);
 		int i=0;
 		for (bigBox_iter = ext_box.begin(); bigBox_iter != ext_box.end(); bigBox_iter++ )	{
 			readPt(*bigBox_iter,dataPts[i]);		// copying the pt to dataPts
-	//		printPt(big,dataPts[i]);	//for debugging
+
 			i++;
 		}
-	//	big.close();	// for debugging
 }
 
 /**
  * prints the distances of the atoms within the given radius
+ * Also computes the coordination number and bond valence
+ *
+ * @param querylist [in]	list that contains all the query atoms
+ * @param kdTree [in]		built kd-tree from all the points form extended box
+ * @param ext_box [in]		list of points from extended box
+ * @param radius [in]		input radius
+ * @param coordType [in]	type of the coordination atom
+ * @param coordDist	[in]	maximum distance for the coordination atom
+ * @param Rval [in]			R value to compute bond valence
  */
 void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<point> &ext_box, double radius, int coordType, float coordDist, float Rval)	{
 
@@ -766,7 +769,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 	stringstream st;		// string stream to output all the bond valence and coordination number for all the query atoms
 	st.precision(5);		// set the precision of stream t to 5
 
-	if (Rval > 0 )	{	// when bond valence needs to be computed
+	if (Rval > 0 )	{		// when bond valence needs to be computed
 		string str(outputFilenameDist);
 		string outbvFilename = str + "_bondVal.txt";
 		char outbvfile[40];							// char array variable to store output file name
@@ -882,13 +885,14 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 		out << "ATOMS" << endl;
 		out << "*\t" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << setw(15) << "ipot" << setw(4) << "tag" << setw(15)<< "Distance" << endl;
 		out << t.str();
-		//cout << t.str();		// for debugging
+
 		out.flush();
 		delete [] nnIdx;							// clean things up
 		delete [] dists;
 		out.close();								// close the output file
 	}
-	if (Rval > 0)	{
+
+	if (Rval > 0)	{	// when bond valence needs to be computed
 		outbv << st.str();
 		outbv.flush();
 		outbv.close();
@@ -944,8 +948,7 @@ void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &c
 
 		RVal = getRValues(RMap,atomNotation);
 		cout << "Rval = " << RVal << endl;
-//		int temp;
-//		cin >> temp;
+
 	}
 }
 
@@ -1013,7 +1016,7 @@ int main(int argc, char **argv)	{
 	int bigBoxSize = ext_box.size();	// size of the big box
 	//cout << "filled big box of size :" << ext_box.size() << endl;	// for debugging
 
-	displayAtomlist();	// displays the list of atoms present in the input
+	displayAtomlist();		// displays the list of atoms present in the input
 
 	int atomChoice;			// atom number for neighborhood search
 	double radius;			// radius in which search is made
@@ -1027,9 +1030,6 @@ int main(int argc, char **argv)	{
 	takesInput (atomChoice, radius, coordAtomChoice, coordDist, RVal);		// takes the input from the user
 
 	cout << "RVal = " << RVal << endl;
-
-//	int temp;
-//	cin >> temp;
 
 	vector<queryPoint> querylist;
 	//vector<point> querylist;

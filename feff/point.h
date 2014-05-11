@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>				// for ostream
 
 using namespace std;
 
@@ -24,6 +25,8 @@ public:
 
 	//overload Constructor
 	point(double, double, double, int);
+
+	void print(ostream &out);
 
 	//Destructor
 	~point();

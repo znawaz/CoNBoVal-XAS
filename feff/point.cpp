@@ -20,6 +20,10 @@ point::point(double X, double Y, double Z, int Type)	{
 	type = Type;
 }
 
+void point::print(ostream &out)	{
+	out << x << " " << y << " " << z << endl;
+}
+
 point::~point()	{
 
 }
