@@ -134,13 +134,13 @@ map<string,vector<float> > loadRValues()	{
 			float val;
 			vector<float> Rvals;
 			iss >> atomNotation;
-			//cout << atomNotation;
+
 			while ( !iss.eof() )	{
 				iss >> val;
 				//cout << " " << val;
 				Rvals.push_back(val);
 			}
-			//cout << endl;
+
 			Rmap[atomNotation] = Rvals;
 		}
 	}
@@ -184,7 +184,7 @@ float getRValues(map<string,vector<float> > Rmap, string atom)	{
 		int idx;
 		cout << "Enter the index : ";
 		cin >> idx;
-		//cout << "Corresponding R Value " << RVals[idx-1] << endl;
+	
 		RVal = RVals[idx-1];
 
 	} else
@@ -479,7 +479,7 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 	vector< vector<point> >::iterator box_iter;
 	vector<point>::iterator point_iter;
 	point p;
-	//cout << "gp_box size: " << gp_box.size() << endl;
+
 	for (unsigned int i=0; i<2;i++)	{	// iterates in z-direction
 
 		for (unsigned int j=0; j < 2; j++)	{	// iterates the first two rows of blocks twice
@@ -677,9 +677,6 @@ struct queryPoint	{
 void constructQuerylist(vector<point>& point_list, int choice, vector<queryPoint> & query_list )	{
 	vector<point>:: iterator point_list_itr;
 
-	//ofstream qFile;					// for debugging
-	//qFile.open("querylist.txt");		// for debugging
-
 	int i = 1;
 	for(point_list_itr=point_list.begin(); point_list_itr != point_list.end(); point_list_itr++)	{
 
@@ -691,7 +688,7 @@ void constructQuerylist(vector<point>& point_list, int choice, vector<queryPoint
 		}
 		i++;
 	}
-//	qFile.close();
+
 }
 
 /**
@@ -733,7 +730,7 @@ int lookupAtomicNumber(string notation, vector<string> table)	{
 void addToListOfAtoms(set<int>& aset, stringstream& s, int type, int number, string name )	{
 	if ( aset.find(type) == aset.end()	)	{		// if type is not found, then insert it
 		aset.insert(type);
-		//cout << "\t" << type << "\t" << number << "\t" << name << endl;	// for debugging
+		
 		s << "\t" << type << "\t" << number << "\t" << name << endl;
 	}
 
@@ -746,7 +743,7 @@ void copyBigBoxPoints(vector<point> &ext_box, ANNpointArray &dataPts)	{
 	vector<point>::iterator bigBox_iter;
 
 		// copy all the points in bigBox vector to dataPts
-		//copyBigBoxPoints(ext_box, dataPts);
+		
 		int i=0;
 		for (bigBox_iter = ext_box.begin(); bigBox_iter != ext_box.end(); bigBox_iter++ )	{
 			readPt(*bigBox_iter,dataPts[i]);		// copying the pt to dataPts
@@ -802,15 +799,13 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 		readPt(query_iter->qpoint,queryPt);	// reads the query point from query_iter and copy to queryPt
 		string out_file = outputFilenameDist + static_cast<ostringstream*>( &(ostringstream() << fileno++ ) )->str() + ".inp"; // convert fileno to string and concatenate
 
-		//cout << out_file << endl;	// for debugging
+		
 
 		char outfile[30];					// char array variable to store output file name
 		strcpy(outfile, out_file.c_str());	// convert the string to char array
 		out.open(outfile);					// opens the output file
 
-		//out << "Query point: ";				// echo query point
-		//printPt(out, queryPt);				// prints ANNpoint object
-
+		
 		//initially k is set to zero, as this function will return the number of points "NeighborCount" present in the radius*radius
 		int NeighborCount = kdTree->annkFRSearch(						// search
 										queryPt,						// query point
@@ -822,7 +817,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 
 		k = NeighborCount;
 		cout  << "within the given radius : " << NeighborCount << endl;
-		//out  << "within the given radius : " << NeighborCount << endl;
+		
 		nnIdx = new ANNidx[k];						// allocate near neigh indices
 		dists = new ANNdist[k];						// allocate near neighbor dists
 
@@ -870,7 +865,6 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 
 			// lookup the atomic number from the periodic table
 			int atomic_number = lookupAtomicNumber(atom_name, periodicTable);
-			//cout << "atomic number"<< atomic_number << " Notation: " << atom_name << endl;
 
 			if (i==0)	{	// the query atom
 				queryAtomName = atom_name;
@@ -923,7 +917,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
  * takes the input from the user
  */
 void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &coordDist, float &RVal)	{
-	char continueValence; 	// y/n choice to continue calculating valence
+	char continueValence; 	// 'y/n' choice to continue calculating valence
 	bool correctEntry = false;		// check whether entered the right choice
 
 	do {		// iterates till get the right entry
@@ -973,9 +967,6 @@ void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &c
 
 int main(int argc, char **argv)	{
 
-//	char queryFilename[] = "query.txt";		// for debugging
-//	char bigFilename[] = "big-data.txt";	// for debugging
-
 	vector<point> box;							// vector of all points calling it a box
 
 	ANNpointArray		dataPts;				// data points
@@ -989,51 +980,26 @@ int main(int argc, char **argv)	{
 
 	box = readFile(inputFilename);				// read the input file and populate the box
 
-//	ofstream dataFile;				// for debugging
-//	dataFile.open("datafile.txt");		// for debugging
-//	printPointlist(dataFile,box);	// for debugging
 
 	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
 
-//	cout << "xmax : " << mm.xmax << " idx = "<< mm.xmax_idx << endl;
-//	printPoint(box[mm.xmax_idx]);
-//	cout << "xmin : " << mm.xmin << " idx = "<< mm.xmin_idx << endl;
-//	printPoint(box[mm.xmin_idx]);
-//	cout << "ymax : " << mm.ymax << " idx = "<< mm.ymax_idx << endl;
-//	printPoint(box[mm.ymax_idx]);
-//	cout << "ymin : " << mm.ymin << " idx = "<< mm.ymin_idx << endl;
-//	printPoint(box[mm.ymin_idx]);
-//	cout << "zmax : " << mm.zmax << " idx = "<< mm.zmax_idx << endl;
-//	printPoint(box[mm.zmax_idx]);
-//	cout << "zmin : " << mm.zmin << " idx = "<< mm.zmin_idx << endl;
-//	printPoint(box[mm.zmin_idx]);
 
 	// computes the dx, dy and dz
 	double dx = mm.xmax - mm.xmin;
 	double dy = mm.ymax - mm.ymin;
 	double dz = mm.zmax - mm.zmin;
 
-//	cout << "dx= " << dx << endl;	// for debugging
-//	cout << "dy= " << dy << endl;	// for debugging
-//	cout << "dz= " << dz << endl;	// for debugging
-
 	// partitions the box into 8 small boxes
 	Find_Small_boxes(box,group_box,mm,dx,dy,dz);
-//	cout << "group_box size: " << group_box.size() << endl;	// for debugging
-//	printGPbox(group_box);									// for debugging
 
 	//After wrapping the box all around symmetrically, the size of points increases to 8 times the original
 	vector<point> ext_box;	// larger box which also contains the points of neighboring boxes as well
 
-//	ofstream bigFile;				// for debugging
-//	bigFile.open(bigFilename);		// for debugging
 
 	fillBigBox(group_box, ext_box, dx, dy, dz);	// fills the larger box with values
-//	printPointlist(bigFile,ext_box);		// for debugging
-//	bigFile.close(); 						// for debugging
+
 
 	int bigBoxSize = ext_box.size();	// size of the big box
-	//cout << "filled big box of size :" << ext_box.size() << endl;	// for debugging
 
 	displayAtomlist();		// displays the list of atoms present in the input
 
@@ -1041,23 +1007,17 @@ int main(int argc, char **argv)	{
 	double radius;			// radius in which search is made
 
 	int coordAtomChoice = 0;	// coordination atom choice
-	float coordDist = 0.0;			// coordination distance
+	float coordDist = 0.0;		// coordination distance
 
-	//cout << "size of the box : " << box.size() << endl;			// for debugging
-	float RVal = 0.0;
+	float RVal = 0.0;			// R Value
 
 	takesInput (atomChoice, radius, coordAtomChoice, coordDist, RVal);		// takes the input from the user
 
 	cout << "RVal = " << RVal << endl;
 
 	vector<queryPoint> querylist;
-	//vector<point> querylist;
-
-//	ofstream queryFile;		// for debugging
-//	queryFile.open(queryFilename);	// for debugging
 
 	constructQuerylist(box,atomChoice,querylist);	// construct querylist from atomChoice
-//	printPointlist(queryFile , querylist);	// prints all the query points in file for debugging
 
 	dataPts = annAllocPts(bigBoxSize, dim);		// allocate array of data points
 
@@ -1077,7 +1037,6 @@ int main(int argc, char **argv)	{
 	delete kdTree;								// delete the kdTree
 	annClose();									// done with ANN
 
-//	queryFile.close();							// close query file
 
 	return 0;
 }
@@ -1088,38 +1047,21 @@ void getArgs(int argc, char **argv)
 {
 	strcpy(inputFilename,"MD-data");
 	strcpy(outputFilenameDist,"feff");
-	strcpy(outputFilenameVal,"_bondVal.txt");
+	strcpy(outputFilenameVal,"bondVal.txt");
 
-//	if (argc <= 1) {							// no arguments
-//		cerr << "Usage:\n\n"
-//		<< "  ./ConBoVal-XAS [-i inputfile] [-d prefix] [-b bondValence]"
-//		   "\n\n"
-//		<< "  where:\n"
-//		<< "    inputfile		name of the input file containing position of atoms (default = \"MD-data\")\n"
-//		<< "    prefix     		prefix name of the output files that contain distances (default = \"feff\")\n"
-//		<< "    bondValence     name of the output file that contain bond valence (default = \"_bondVal.txt\")\n"
-//		<< " Results are stored in prefix and bondValence files.\n"
-//		<< "\n"
-//		<< " To run this demo use:\n"
-//		<< "    feff -i MD-data -d feff -b bond-valence.txt \n"
-//		<< "\n"
-//		<< "or \n"
-//		<< "ConBoVal-XAS \n";
-//		exit(0);
-//	}
 	int i = 1;
 	while (i < argc) {							// read arguments
-		if (!strcmp(argv[i], "-i")) {			// -d option
+		if (!strcmp(argv[i], "-i")) {			// -i option
 			strcpy(inputFilename,argv[++i]);
-			//inFilePtr = argv[++i];			// get dimension to dump
+			
 		}
-		else if (!strcmp(argv[i], "-d")) {		// -max option
+		else if (!strcmp(argv[i], "-d")) {		// -d option
 			strcpy(outputFilenameDist,argv[++i]);
-			//outFileDistPtr = argv[++i];	// get max number of points
+			
 		}
-		else if (!strcmp(argv[i], "-b")) {		// -nn option
+		else if (!strcmp(argv[i], "-b")) {		// -b option
 			strcpy(outputFilenameVal,argv[++i]);
-			//outFileValPtr = argv[++i];		// get number of near neighbors
+			
 		}
 		else if (!strcmp(argv[i], "--help")) {		// --help option
 			cerr << "Usage:\n\n"
