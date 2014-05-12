@@ -1,8 +1,6 @@
-# I am a comment, and I want to say that the variable CC will be
 # the compiler to use.
 CC=g++
-# Hey!, I am comment number 2. I want to say that CFLAGS will be the
-# options I'll pass to the compiler.
+#Compiler options
 CFLAGS=-c -Wall
 
 all: CoNBoVal-XAS
@@ -21,5 +19,3 @@ point.o: point.cpp
 
 clean:
 	rm *_bondVal.txt *.inp CoNBoVal-XAS
-	#rm files/* 
-	#cp ../files/*.bin files
