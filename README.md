@@ -7,7 +7,7 @@
 </head><body>
 <h1 style="font-family: Arial;">CoNBoVal-XAS</h1>
 
-<span style="font-family: Arial;">CoNBoVal_XAS</span> : <span style="font-family: Arial;">Coordination Number Bond Valence for X-Ray
+<span style="font-family: Arial;">CoNBoVal_XAS</span>: <span style="font-family: Arial;">Coordination Number Bond Valence for X-Ray
 Absorption Spectroscopy<br>
 <br>
 CoNBoVal_XAS is a program which takes atom positions in three
@@ -16,9 +16,9 @@ dimensions and computes the following<br>
 <ul>
 
   <li><span style="font-family: Arial;">Nearest neighborhood distance
-of the neighboring atoms for a given atom and with in a specified
+of the neighboring atoms for a given atom and within a specified
 distance</span>. <span style="font-family: Arial;">This output becomes
-the input for the FEFF software.</span></li>
+the input of the FEFF software.</span></li>
   <li><span style="font-family: Arial;">Coordination Number when
 provided with coordination atom</span></li>
   <li><span style="font-family: Arial;">Bond Valence for all the
@@ -31,7 +31,7 @@ nearest neighborhood distance, it becomes the input for the FEFF
 software.<br>
 <br>
 The computation of Coordination number and Bond Valence of the
-coordinating atom can be used as validation of DFT or molecular
+coordinating atom can be used as a validation of DFT or molecular
 dynamics simulation.<br>
 <br>
 </span>
@@ -39,18 +39,18 @@ dynamics simulation.<br>
 
 <span style="font-family: Arial;">To build the CoNBoVal-XAS, you need
 to download ANN (Approximate Nearest Neighbors) library from <a href="http://www.cs.umd.edu/%7Emount/ANN">http://www.cs.umd.edu/~mount/ANN</a>.</span>&nbsp;
-<span style="font-family: Arial;">Dowload the latest zip file in a
+<span style="font-family: Arial;">Download the latest zip file in a
 directory. Then you need to set ANN_HOME environment variable. In
-linux, it can be set as follows<br>
+Linux, it can be set as follows<br>
 <br>
 <span style="font-family: Courier New;">export ANN_HOME=[path to ann
 library]</span></span><code style="border: medium none ; margin: 0px; padding: 0px; font-family: Courier New; font-size: 12px; background-color: transparent; white-space: pre; display: inline; line-height: inherit;"></code><span style="font-family: Arial;"><span style="font-family: Courier New;">/ann_1.1.2</span><br style="font-family: Courier New;">
 <br>
-like on my system it is<br>
+Like on my system it is<br>
 <span style="font-family: Courier New;">export
 ANN_HOME=/home/zubair/software/ann_1.1.2</span><br>
 <br>
-If you want to keep it permanent, copy this line in .bashrc.<br>
+If you want to keep it permanently, copy this line in .bashrc.<br>
 <br>
 To build, type in the root directory of CoNBoVal-XAS the following<br>
 <span style="font-family: Courier New;">make</span><br>
@@ -83,14 +83,14 @@ CoNBoVal-XAS<br>
 <br>
 </span></span>
 <h2><span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">Author</span></span></span></h2>
-<span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">The main author of this program is Zubair Nawaz (<a href="mailto:zubair.nawaz@gmail.com">zubair.nawaz@gmail.com</a>). It is development with the help of Beamline Scientist Messaoud Harfouche</span>.<br>
+<span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">The main author of this program is Zubair Nawaz (<a href="mailto:zubair.nawaz@gmail.com">zubair.nawaz@gmail.com</a>). It is developed with the help of Beamline Scientist Messaoud Harfouche</span>.<br>
 <br>
 </span></span>
 <h2><span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">Acknowledgement</span></span></span></h2>
 <h2><span style="font-family: Arial;"><span style="font-family: Courier New;"></span></span></h2>
 <span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">&nbsp;</span><span style="font-family: Arial;">This
 work was developed in SESAME and funded under the LinkSCEEM-2 project
-under Grant Agreement 261600 of the 7th framework programme for
+under Grant Agreement 261600 of the 7th framework program for
 research (FP7)</span>.<br>
 </span>
 </span>
