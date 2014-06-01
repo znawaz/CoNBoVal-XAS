@@ -1011,23 +1011,6 @@ int main(int argc, char **argv)	{
 
 	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
 
-	ofstream mout;			// for debugging
-	mout.open("min-max.txt");	// for debugging
-
-		mout << "xmax : " << mm.xmax << " idx = "<< mm.xmax_idx << endl;
-		printPoint(mout,box[mm.xmax_idx]);
-		mout << "xmin : " << mm.xmin << " idx = "<< mm.xmin_idx << endl;
-		printPoint(mout,box[mm.xmin_idx]);
-		mout << "ymax : " << mm.ymax << " idx = "<< mm.ymax_idx << endl;
-		printPoint(mout,box[mm.ymax_idx]);
-		mout << "ymin : " << mm.ymin << " idx = "<< mm.ymin_idx << endl;
-		printPoint(mout,box[mm.ymin_idx]);
-		mout << "zmax : " << mm.zmax << " idx = "<< mm.zmax_idx << endl;
-		printPoint(mout,box[mm.zmax_idx]);
-		mout << "zmin : " << mm.zmin << " idx = "<< mm.zmin_idx << endl;
-		printPoint(mout,box[mm.zmin_idx]);
-	mout.close();
-
 	// computes the dx, dy and dz
 	double dx = mm.xmax - mm.xmin;
 	double dy = mm.ymax - mm.ymin;
