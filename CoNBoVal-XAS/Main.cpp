@@ -479,6 +479,11 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 	vector< vector<point> >::iterator box_iter;
 	vector<point>::iterator point_iter;
 	point p;
+<<<<<<< HEAD
+=======
+
+	for (unsigned int i=0; i<2;i++)	{	// iterates in z-direction
+>>>>>>> 508cdd518afc689c4a583960839876eb7dd99297
 
 	for (unsigned int i=0; i<2;i++)	{				// iterates in z-direction
 
@@ -1011,6 +1016,10 @@ int main(int argc, char **argv)	{
 
 	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 508cdd518afc689c4a583960839876eb7dd99297
 	// computes the dx, dy and dz
 	double dx = mm.xmax - mm.xmin;
 	double dy = mm.ymax - mm.ymin;
@@ -1024,6 +1033,10 @@ int main(int argc, char **argv)	{
 
 
 	fillBigBox(group_box, ext_box, dx, dy, dz);	// fills the larger box with values
+<<<<<<< HEAD
+=======
+
+>>>>>>> 508cdd518afc689c4a583960839876eb7dd99297
 
 
 	int bigBoxSize = ext_box.size();			// size of the big box
@@ -1043,6 +1056,11 @@ int main(int argc, char **argv)	{
 	cout << "RVal = " << RVal << endl;
 
 	vector<queryPoint> querylist;
+<<<<<<< HEAD
+=======
+	//vector<point> querylist;
+
+>>>>>>> 508cdd518afc689c4a583960839876eb7dd99297
 
 	constructQuerylist(box,atomChoice,querylist);	// construct querylist from atomChoice
 
