@@ -480,9 +480,9 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 	vector<point>::iterator point_iter;
 	point p;
 
-	for (unsigned int i=0; i<2;i++)	{	// iterates in z-direction
+	for (unsigned int i=0; i<2;i++)	{				// iterates in z-direction
 
-		for (unsigned int j=0; j < 2; j++)	{	// iterates the first two rows of blocks twice
+		for (unsigned int j=0; j < 2; j++)	{		// iterates the first two rows of blocks twice
 
 			for (unsigned int k=0; k < 2; k++)	{	// iterates twice block 1 and 2 in x-direction
 
@@ -519,7 +519,7 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 			for (unsigned int k=0; k < 2; k++)	{	// iterates twice block 3 and 4 in x-direction
 				//i_x_add += x_incr;
 
-				box_iter = gp_box.begin() + 5; // get the 5th box
+				box_iter = gp_box.begin() + 5; 		// get the 5th box
 				// for each point in the 5th box add the x_add, y_add and z_add respectively
 				for (point_iter = box_iter->begin(); point_iter != box_iter->end(); point_iter++)	{
 					p.x = point_iter->x + iii_x_add;
@@ -545,8 +545,8 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 				iii_x_add += x_incr;	// add x_incr to third block
 				iv_x_add += x_incr;		// add x_incr to fourth block
 			}
-			iii_x_add -= 2*x_incr;	// get x_add for 3rd block back
-			iv_x_add -= 2*x_incr;	// get x_add for 4th block back
+			iii_x_add -= 2*x_incr;		// get x_add for 3rd block back
+			iv_x_add -= 2*x_incr;		// get x_add for 4th block back
 
 			i_y_add += y_incr;
 			ii_y_add += y_incr;
@@ -556,11 +556,11 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 
 		i_y_add -= 2*y_incr;		// get y_add for 1st block back
 		ii_y_add -= 2*y_incr;		// get y_add for 2nd block back
-		iii_y_add -= 2*y_incr;	// get y_add for 3rd block back
+		iii_y_add -= 2*y_incr;		// get y_add for 3rd block back
 		iv_y_add -= 2*y_incr;		// get y_add for 4th block back
 
 
-		for (unsigned int j=0; j < 2; j++)	{	// iterates the first two rows of blocks twice
+		for (unsigned int j=0; j < 2; j++)	{		// iterates the first two rows of blocks twice
 
 			for (unsigned int k=0; k < 2; k++)	{	// iterates twice block 5 and 6 in x-direction
 
@@ -596,7 +596,7 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 
 			for (unsigned int k=0; k < 2; k++)	{	// iterates twice block 7 and 8 in x-direction
 
-				box_iter = gp_box.begin() + 1; // get the 1st box
+				box_iter = gp_box.begin() + 1; 		// get the 1st box
 				// for each point in the 1st box add the x_add, y_add and z_add respectively
 				for (point_iter = box_iter->begin(); point_iter != box_iter->end(); point_iter++)	{
 					p.x = point_iter->x + vii_x_add;
@@ -619,22 +619,22 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 					bigBox.push_back(p);
 
 				}
-				vii_x_add += x_incr;		// add x_incr to third block
-				viii_x_add += x_incr;		// add x_incr to fourth block
+				vii_x_add += x_incr;	// add x_incr to third block
+				viii_x_add += x_incr;	// add x_incr to fourth block
 			}
-			vii_x_add -= 2*x_incr;	// get x_add for 7th block back
-			viii_x_add -= 2*x_incr;	// get x_add for 8th block back
+		vii_x_add -= 2*x_incr;			// get x_add for 7th block back
+			viii_x_add -= 2*x_incr;		// get x_add for 8th block back
 
-			v_y_add += y_incr;		// add y_incr to 5th block
-			vi_y_add += y_incr;		// add y_incr to 6th block
-			vii_y_add += y_incr;	// add y_incr to 7th block
-			viii_y_add += y_incr;	// add y_incr to 8th block
+			v_y_add += y_incr;			// add y_incr to 5th block
+			vi_y_add += y_incr;			// add y_incr to 6th block
+			vii_y_add += y_incr;		// add y_incr to 7th block
+			viii_y_add += y_incr;		// add y_incr to 8th block
 		}
 
 		v_y_add -= 2*y_incr;			// get y_add for 5th block back
 		vi_y_add -= 2*y_incr;			// get y_add for 6th block back
-		vii_y_add -= 2*y_incr;		// get y_add for 7th block back
-		viii_y_add -= 2*y_incr;		// get y_add for 8th block back
+		vii_y_add -= 2*y_incr;			// get y_add for 7th block back
+		viii_y_add -= 2*y_incr;			// get y_add for 8th block back
 
 		i_z_add += z_incr;
 		ii_z_add += z_incr;
@@ -753,8 +753,25 @@ void copyBigBoxPoints(vector<point> &ext_box, ANNpointArray &dataPts)	{
 }
 
 /**
- * prints the distances of the atoms within the given radius
- * Also computes the coordination number and bond valence
+ * prints the make script for one input
+ *
+ * @param out [in]			output stream to write in
+ * @param out_file [in]		name of the output file
+ * @param lineNo [in]		line number of the query atom
+ */
+void printMakeScript(ostream &out, string out_file, int lineNo)	{
+	out << "mkdir cluster" << lineNo << endl;
+	out << "cp " << out_file << " cluster" << lineNo << "/feff.inp" << endl;
+	out << "cd cluster" << lineNo << endl;
+	out << "run_feff 4" << endl;
+	out << "cp chi.data ../chi.dat" << lineNo << endl;
+	out << "cd .." << endl << endl;
+}
+
+/**
+ * prints the distances of the atoms within the given radius,
+ * computes the coordination number and bond valence and
+ * prints the script to run for feff
  *
  * @param querylist [in]	list that contains all the query atoms
  * @param kdTree [in]		built kd-tree from all the points form extended box
@@ -779,10 +796,16 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 	nnIdx = NULL;
 	dists = NULL;
 
-	ofstream out, outbv;	// outbv for writing bond Valence into file
-	int fileno = 0;
+	ofstream out, outbv, outmk;	// outbv for writing bond Valence into file, outmk for make feffscript
 	stringstream st;		// string stream to output all the bond valence and coordination number for all the query atoms
 	st.precision(5);		// set the precision of stream t to 5
+
+	// creates a file for feffscript
+	string str(outputFilenameDist);
+	string outmkFilename = str + "_feffscript.make";
+	char outmkFile[40];
+	strcpy(outmkFile, outmkFilename.c_str());
+	outmk.open(outmkFile);
 
 	if (Rval > 0 )	{		// when bond valence needs to be computed
 		string str(outputFilenameDist);
@@ -797,7 +820,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 	// get each point from the query list and finds the neighborhood
 	for (query_iter = querylist.begin(); query_iter != querylist.end(); query_iter++ )	{
 		readPt(query_iter->qpoint,queryPt);	// reads the query point from query_iter and copy to queryPt
-		string out_file = outputFilenameDist + static_cast<ostringstream*>( &(ostringstream() << fileno++ ) )->str() + ".inp"; // convert fileno to string and concatenate
+		string out_file = outputFilenameDist + static_cast<ostringstream*>( &(ostringstream() << query_iter->lineNo ) )->str() + ".inp"; // convert lineno to string and concatenate
 
 		
 
@@ -809,11 +832,11 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 		//initially k is set to zero, as this function will return the number of points "NeighborCount" present in the radius*radius
 		int NeighborCount = kdTree->annkFRSearch(						// search
 										queryPt,						// query point
-								radius * radius,							// square of the radius for search
-											k=0,							// number of near neighbors
-											nnIdx,							// nearest neighbors (returned)
-											dists,							// distance (returned)
-											eps);							// error bound
+								radius * radius,						// square of the radius for search
+											k=0,						// number of near neighbors
+											nnIdx,						// nearest neighbors (returned)
+											dists,						// distance (returned)
+											eps);						// error bound
 
 		k = NeighborCount;
 		cout  << "within the given radius : " << NeighborCount << endl;
@@ -824,21 +847,21 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 		// once again call the annkFRSearch to get the k values in nnIdx and dists
 		NeighborCount = kdTree->annkFRSearch(						// search
 												queryPt,						// query point
-										radius * radius,							//
+										radius * radius,						// radius
 													k,							// number of near neighbors
-													nnIdx,							// nearest neighbors (returned)
-													dists,							// distance (returned)
-													eps);							// error bound
+													nnIdx,						// nearest neighbors (returned)
+													dists,						// distance (returned)
+													eps);						// error bound
 
-		set<int> atom_set;	// set which contains the unique atoms in the neighborhood
+		set<int> atom_set;			// set which contains the unique atoms in the neighborhood
 
-		printHeader(out);	// prints the header information in the outputfile
-		stringstream s;		// string stream to output the unique atoms in the neighborhood
-		stringstream t;		// string stream to output all the atoms with distances in the neighborhood
-		t.precision(5);		// set the precision of stream t to 5
+		printHeader(out);			// prints the header information in the outputfile
+		stringstream s;				// string stream to output the unique atoms in the neighborhood
+		stringstream t;				// string stream to output all the atoms with distances in the neighborhood
+		t.precision(5);				// set the precision of stream t to 5
 
-		float bondVal = 0.0;	// bond valence of coordination type
-		int coordNum = 0;		// coordination number of coordination type
+		float bondVal = 0.0;		// bond valence of coordination type
+		int coordNum = 0;			// coordination number of coordination type
 
 		string queryAtomName="";	// name of the query atom
 
@@ -893,7 +916,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 
 		}
 
-		atom_set.clear();		// empty the set
+		atom_set.clear();							// empty the set
 		out << s.str() << endl << endl << endl;		// prints the unique atom list
 		out << "ATOMS" << endl;
 		out << "*\t" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << setw(15) << "ipot" << setw(4) << "tag" << setw(15)<< "Distance" << endl;
@@ -903,6 +926,9 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 		delete [] nnIdx;							// clean things up
 		delete [] dists;
 		out.close();								// close the output file
+
+		// writes the make script
+		printMakeScript(outmk, out_file, query_iter->lineNo);
 	}
 
 	if (Rval > 0)	{	// when bond valence needs to be computed
@@ -910,6 +936,8 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 		outbv.flush();
 		outbv.close();
 	}
+	outmk.flush();
+	outmk.close();
 	cout << "Read query Points " << endl;
 }
 
@@ -917,7 +945,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
  * takes the input from the user
  */
 void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &coordDist, float &RVal)	{
-	char continueValence; 	// 'y/n' choice to continue calculating valence
+	char continueValence; 			// 'y/n' choice to continue calculating valence
 	bool correctEntry = false;		// check whether entered the right choice
 
 	do {		// iterates till get the right entry
@@ -944,7 +972,7 @@ void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &c
 
 		map<string, vector <float> > RMap = loadRValues();		// loads the R values from the file
 
-		correctEntry = false;		// check whether entered the right choice
+		correctEntry = false;									// check whether entered the right choice
 		do {		// iterates till get the right entry
 			cout << "Enter the coordination atom from the index: ";
 			cin >> coordAtomChoice;
@@ -983,6 +1011,22 @@ int main(int argc, char **argv)	{
 
 	find_MinMax(box, mm);	// find the min & max of the points in x,y & z.
 
+	ofstream mout;			// for debugging
+	mout.open("min-max.txt");	// for debugging
+
+		mout << "xmax : " << mm.xmax << " idx = "<< mm.xmax_idx << endl;
+		printPoint(mout,box[mm.xmax_idx]);
+		mout << "xmin : " << mm.xmin << " idx = "<< mm.xmin_idx << endl;
+		printPoint(mout,box[mm.xmin_idx]);
+		mout << "ymax : " << mm.ymax << " idx = "<< mm.ymax_idx << endl;
+		printPoint(mout,box[mm.ymax_idx]);
+		mout << "ymin : " << mm.ymin << " idx = "<< mm.ymin_idx << endl;
+		printPoint(mout,box[mm.ymin_idx]);
+		mout << "zmax : " << mm.zmax << " idx = "<< mm.zmax_idx << endl;
+		printPoint(mout,box[mm.zmax_idx]);
+		mout << "zmin : " << mm.zmin << " idx = "<< mm.zmin_idx << endl;
+		printPoint(mout,box[mm.zmin_idx]);
+	mout.close();
 
 	// computes the dx, dy and dz
 	double dx = mm.xmax - mm.xmin;
@@ -999,7 +1043,7 @@ int main(int argc, char **argv)	{
 	fillBigBox(group_box, ext_box, dx, dy, dz);	// fills the larger box with values
 
 
-	int bigBoxSize = ext_box.size();	// size of the big box
+	int bigBoxSize = ext_box.size();			// size of the big box
 
 	displayAtomlist();		// displays the list of atoms present in the input
 
@@ -1019,7 +1063,7 @@ int main(int argc, char **argv)	{
 
 	constructQuerylist(box,atomChoice,querylist);	// construct querylist from atomChoice
 
-	dataPts = annAllocPts(bigBoxSize, dim);		// allocate array of data points
+	dataPts = annAllocPts(bigBoxSize, dim);			// allocate array of data points
 
 //	copy all the points in bigBox vector to dataPts
 	copyBigBoxPoints(ext_box, dataPts);
@@ -1063,7 +1107,7 @@ void getArgs(int argc, char **argv)
 			strcpy(outputFilenameVal,argv[++i]);
 			
 		}
-		else if (!strcmp(argv[i], "--help")) {		// --help option
+		else if (!strcmp(argv[i], "--help")) {	// --help option
 			cerr << "Usage:\n\n"
 					<< "  CoNBoVal-XAS [-i inputfile] [-d prefix] [-b bondValence]"
 					   "\n\n"
