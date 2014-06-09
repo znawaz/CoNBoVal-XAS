@@ -45,6 +45,10 @@
 using namespace std;
 
 map<int, string> atom_list;			// map to store atom type and atom notation from input file
+map<int, int> new_atom_list;		// list that maps old to new, first integer the old index,
+									//							 second integer the new index
+map<int, int> inv_atom_list;		// inverted list that maps new to old, first integer the new index,
+									//							  	      second integer the old index
 
 int				k;					// number of nearest neighbors
 int				dim	= 3;			// dimension
@@ -649,15 +653,134 @@ void fillBigBox(vector<vector<point> >& gp_box, vector<point>& bigBox, const dou
 }
 
 /**
- * displays the list of atoms present in the input
+ * Return the new atom type when provided with old type
+ *
+ * @param o [in] 	old atom type
+ * @return 			new atom type or -1 if not found
  */
-void displayAtomlist()	{
+int returnNewAtomType(int o)	{
+	int n = -1;		// if not found
+	map<int,int>::iterator nAtom_list_itr;
+	nAtom_list_itr = new_atom_list.find(o);
+	if ( nAtom_list_itr != new_atom_list.end() )
+		n = nAtom_list_itr->second;
+	return n;
+}
+
+/**
+ * Return the old atom type when provided with new type
+ *
+ * @param n [in] 	new atom type
+ * @return 			old atom type or -1 if not found
+ */
+int returnOldAtomType(int n)	{
+	int o = -1;	// if not found
+	map<int,int>::iterator oAtom_list_itr;
+	oAtom_list_itr = inv_atom_list.find(n);
+	if ( oAtom_list_itr != inv_atom_list.end() )
+		o = oAtom_list_itr->second;
+	return o;
+}
+
+/**
+ * populate a set with old index of atoms and returns it
+ */
+set<int> populateSet()	{
+	set<int> oldAtomSet;
+	map<int,string>::iterator atom_list_itr;
+	for(atom_list_itr=atom_list.begin();atom_list_itr!=atom_list.end();atom_list_itr++)	{
+		oldAtomSet.insert(atom_list_itr->first);
+	}
+	return oldAtomSet;
+}
+
+/**
+ * Display the list of atoms in the set
+ */
+void displaySet(set<int> atomSet)	{
+	set<int>::iterator atom_set_itr;
+	for(atom_set_itr = atomSet.begin(); atom_set_itr != atomSet.end(); atom_set_itr++)	{
+		cout << *atom_set_itr << " ";
+	}
+	cout << endl;
+}
+
+/**
+ * Just copies the old index to new index, no change
+ */
+void copyOldIndex()	{
+	map<int,string>::iterator atom_list_itr;
+	for (atom_list_itr = atom_list.begin(); atom_list_itr != atom_list.end(); atom_list_itr++ )	{
+		new_atom_list[atom_list_itr->first] = atom_list_itr->first;
+		inv_atom_list[atom_list_itr->first] = atom_list_itr->first;	// new to old index
+	}
+}
+
+/*
+ * Gets the new Atom list
+ */
+void getNewAtomList()	{
+	int oldAtomType;
+	cout << "Enter the new Atom list "	<< endl;
+	bool correctEntry = false;
+
+	set <int> oldAtomSet = populateSet();
+
+	cout << "New Index" << "\t" << "Old Index" << endl;
+	for (unsigned int i = 0; i < atom_list.size(); i++)	{
+		cout << "Available old indices" << "\t";
+		displaySet(oldAtomSet);
+
+		cout << i+1 << "\t";
+
+		do {
+			cin >> oldAtomType;
+
+			if (atom_list.find(oldAtomType) == atom_list.end() )	{	// when the entered index is not present in old atom list
+				correctEntry = false;
+				cout << "incorrect old index" << endl << "Enter Again" << endl;
+				cout << "Available old indices" << "\t";
+				displaySet(oldAtomSet);
+				cout << i+1 << "\t";
+			}
+			else	{
+				int atomsErased = oldAtomSet.erase(oldAtomType);
+				if (atomsErased == 0)	{	// could not erase
+					correctEntry = false;
+					cout << "old index already assigned" << endl << "Enter Again" << endl;
+					cout << "Available old indices" << "\t";
+					displaySet(oldAtomSet);
+					cout << i+1 << "\t";
+				}
+				else
+					correctEntry = true;
+			}
+
+		} while (!correctEntry);
+		//cout  << endl;
+		// we create two maps for bi-directional lookup (we can also use bimap from Boost)
+		new_atom_list[oldAtomType] = i+1;	// old to new index
+		inv_atom_list[i+1] = oldAtomType;	// new to old index
+	}
+}
+
+/**
+ * displays the list of atoms (old or new) present in the input
+ *
+ * @param oldList [in] 		true, when to display old list, otherwise false
+ */
+void displayAtomlist(bool oldList)	{
 	map<int,string>::iterator atom_list_itr;
 	cout << "List of available atoms" << endl;
 	for(atom_list_itr = atom_list.begin();atom_list_itr != atom_list.end(); atom_list_itr ++)	{
-		cout << atom_list_itr->first << "  " << atom_list_itr->second << endl;
+		if (oldList)
+			cout << atom_list_itr->first << "  " << atom_list_itr->second << endl;
+		else
+			cout << returnNewAtomType(atom_list_itr->first) << "  " << atom_list_itr->second << endl;
 	}
 }
+
+
 
 /**
  * structure to store the min, max and their respective positions
@@ -872,7 +995,7 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 			// populate the list of unique atoms, present in the neighborhood
 			string atom_name = "";
 			map <int,string>:: iterator atom_iter = atom_list.find(pt.type);
-			if ( atom_iter != atom_list.end() )
+			if ( atom_iter != atom_list.end() )	// if found then
 				atom_name = atom_iter->second;
 
 			if (Rval > 0)	{	// compute coordination number and valence
@@ -901,11 +1024,13 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
 			}
 			else	{	// neighbors of the query atom
 
-				addToListOfAtoms(atom_set,s,pt.type,atomic_number,atom_name);	// add unique atoms to a list
+				int atom_type = returnNewAtomType(pt.type);						// returns new Atom type
+
+				addToListOfAtoms(atom_set,s,atom_type,atomic_number,atom_name);	// add unique atoms to a list
 				t << " \t" << fixed << setw(15) << pt.x - query_iter->qpoint.x;
 				t << fixed << setw(15) << pt.y - query_iter->qpoint.y;
 				t << fixed << setw(15) << pt.z - query_iter->qpoint.z;
-				t << setw(15) << pt.type;
+				t << setw(15) << atom_type;
 				t << setw(4) << atom_name;
 				t << setw(15) << dists[i] << "\n";
 			}
@@ -946,14 +1071,27 @@ void printDistances(vector<queryPoint> &querylist, ANNkd_tree* kdTree, vector<po
  */
 void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &coordDist, float &RVal)	{
 	char continueValence; 			// 'y/n' choice to continue calculating valence
-	bool correctEntry = false;		// check whether entered the right choice
+	char reindex;					// 'y/n' choice to continue re-index
 
+	cout << "Would you like to re-index? (y)es/n(o):";
+	cin >> reindex;
+
+	if (tolower(reindex) == 'y')
+		getNewAtomList();	// takes the new atom list from the user
+	else
+		copyOldIndex();		// just copies the old index into new index, hence no change
+
+	displayAtomlist(false);	// displays the list of atoms with new index present in the input
+
+	int nAtomChoice;
+
+	bool correctEntry = false;		// check whether entered the right choice
 	do {		// iterates till get the right entry
 		cout << "Enter the atom number to search for neighborhood : ";
-			cin >> atomChoice;
+		cin >> nAtomChoice;
 
-		map <int,string>:: iterator atom_iter = atom_list.find(atomChoice);
-		if ( atom_iter != atom_list.end() )
+		atomChoice = returnOldAtomType(nAtomChoice);	// returns the old atom type
+		if (atomChoice > -1)	// if found
 			correctEntry = true;
 		else
 			cout << "Wrong Entry" << endl << "Again ";
@@ -962,7 +1100,7 @@ void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &c
 	cout << "Enter the radius to search: ";
 	cin >> radius;
 
-	cout << "Would you like to calculate bond valence (y)es/n(o)? ";
+	cout << "Would you like to calculate bond valence? (y)es/n(o): ";
 	cin >> continueValence;
 
 	if (tolower(continueValence) == 'y')	{
@@ -972,13 +1110,14 @@ void takesInput (int &atomChoice, double &radius, int &coordAtomChoice, float &c
 
 		map<string, vector <float> > RMap = loadRValues();		// loads the R values from the file
 
+		int nCoordAtomChoice;									// newer coordination atom index
 		correctEntry = false;									// check whether entered the right choice
-		do {		// iterates till get the right entry
+		do {													// iterates till get the right entry
 			cout << "Enter the coordination atom from the index: ";
-			cin >> coordAtomChoice;
+			cin >> nCoordAtomChoice;
 
-			map <int,string>:: iterator atom_iter = atom_list.find(coordAtomChoice);
-			if ( atom_iter != atom_list.end() )
+			coordAtomChoice = returnOldAtomType(nCoordAtomChoice);	// returns the old atom type
+			if (coordAtomChoice > -1)	// if found
 				correctEntry = true;
 			else
 				cout << "Wrong Entry" << endl << "Again ";
@@ -1028,7 +1167,7 @@ int main(int argc, char **argv)	{
 
 	int bigBoxSize = ext_box.size();			// size of the big box
 
-	displayAtomlist();		// displays the list of atoms present in the input
+	displayAtomlist(true);		// displays the list of atoms with old index present in the input
 
 	int atomChoice;			// atom number for neighborhood search
 	double radius;			// radius in which search is made
