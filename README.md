@@ -1,10 +1,8 @@
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
+
   
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-
-
-</head><body>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"></head><body>
 <h1 style="font-family: Arial;">CoNBoVal-XAS</h1>
 
 <span style="font-family: Arial;">CoNBoVal_XAS</span>: <span style="font-family: Arial;">Coordination Number Bond Valence for X-Ray
@@ -40,7 +38,12 @@ dynamics simulation.<br>
 <span style="font-family: Arial;">To build the CoNBoVal-XAS, you need
 to download ANN (Approximate Nearest Neighbors) library from <a href="http://www.cs.umd.edu/%7Emount/ANN">http://www.cs.umd.edu/~mount/ANN</a>.</span>&nbsp;
 <span style="font-family: Arial;">Download the latest zip file in a
-directory. Then you need to set ANN_HOME environment variable. In
+directory. Unzip the file and move to that directory.<br>
+<br>
+Compile ANN with the following command.<br>
+<span style="font-family: Courier New;">make linux-g++<br>
+<br>
+</span>Then you need to set ANN_HOME environment variable. In
 Linux, it can be set as follows<br>
 <br>
 <span style="font-family: Courier New;">export ANN_HOME=[path to ann
@@ -63,16 +66,38 @@ To build, type in the root directory of CoNBoVal-XAS the following<br>
 CoNBoVal-XAS [-i inputfile] [-d prefix] [-b bondValence]</span><br>
 <br>
 where:<br><span style="font-family: Courier New;">
-inputfile&nbsp;</span>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; name
+inputfile&nbsp;</span>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; name
 of the input file containing position of atoms (default = "MD-data")<br><span style="font-family: Courier New;">
 prefix&nbsp;&nbsp;</span>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
 &nbsp;&nbsp; &nbsp; prefix name of the output files that contain
 distances (default = "feff")<br><span style="font-family: Courier New;">
-bondValence</span>&nbsp;&nbsp; suffix name of the output file that contain
-bond valence (default = "_bondVal.txt")<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
-Results are stored in prefix and bondValence files.<br>
+bondValence</span>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; suffix name of the output file that contain
+bond valence (default = "_bondVal.txt")</span><br>
+<br>
+<span style="font-family: Arial;">Results are stored in <span style="font-family: Courier New;">prefixnnnnn.inp, prefix_bondValence.txt</span> and <span style="font-family: Courier New;">prefix_feffscript.make</span> files. Where <span style="font-family: Courier New;">nnnnn</span> represent the line number of the query atom in the list and <span style="font-family: Courier New;">bondValence</span> is suffix name of bond valence file as given in the argument. The file <span style="font-family: Courier New;">prefixnnnnn.inp</span> is the input to feff software. The file <span style="font-family: Courier New;">prefix_bondValence.txt </span>contains the coordination number and the bond valence of the coordination atom. The last file <span style="font-family: Courier New;">prefix_feffscript.make</span> contains the linux bash commands to prepare the input file <span style="font-family: Courier New;">prefixnnnnn.inp</span> for the feff software.</span><br style="font-family: Arial;">
+<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8"><title></title><meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
+	
+	
+	<style type="text/css">
+	<!--
+		@page { margin: 0.79in }
+		H2.ls-body-western { font-size: 12pt; so-language: en-GB; font-weight: normal; page-break-after: auto }
+		H2.ls-body-cjk { font-size: 12pt; so-language: en-US; font-weight: normal; page-break-after: auto }
+		H2.ls-body-ctl { font-family: "Arial"; font-size: 12pt; so-language: hi-IN; font-weight: normal; page-break-after: auto }
+		H2 { margin-left: 0.25in; text-indent: -0.25in; margin-top: 0.02in; margin-bottom: 0.02in; direction: ltr; color: #000000; text-align: justify; widows: 0; orphans: 0 }
+		H2.western { font-family: "Arial", serif; font-size: 12pt; so-language: en-GB; font-weight: normal }
+		H2.cjk { font-size: 12pt; so-language: en-US; font-weight: normal }
+		H2.ctl { font-family: "Arial"; font-size: 12pt; so-language: hi-IN; font-weight: normal }
+		P { margin-bottom: 0.08in; direction: ltr; color: #000000; widows: 0; orphans: 0 }
+		P.western { font-family: "Arial", serif; font-size: 11pt; so-language: en-GB }
+		P.cjk { font-family: "DejaVu Sans"; font-size: 11pt; so-language: ar-SA }
+		P.ctl { font-family: "FreeSans"; font-size: 12pt; so-language: hi-IN }
+		A:link { color: #0000ff }
+		A.western:link { so-language: zxx }
+		A.cjk:link { so-language: zxx }
+		A.ctl:link { font-family: "Times New Roman"; so-language: zxx }
+	--></style><br>
+<span style="font-family: Arial;">
 <br><span style="font-weight: bold;">
 Example:&nbsp;</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp; <br>
@@ -81,6 +106,11 @@ To run this demo use:<br>
 or<br><span style="font-family: Courier New;">
 CoNBoVal-XAS<br>
 <br>
+<span style="font-family: Arial;">The command line help can be obtained as</span><br>
+</span></span><span style="font-family: Arial;"><span style="font-family: Courier New;">
+CoNBoVal-XAS --help</span></span><br>
+<span style="font-family: Arial;"><span style="font-family: Courier New;">
+<br>
 </span></span>
 <h2><span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">Author</span></span></span></h2>
 <span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">The main author of this program is Zubair Nawaz (<a href="mailto:zubair.nawaz@gmail.com">zubair.nawaz@gmail.com</a>). It is developed with the help of Beamline Scientist Messaoud Harfouche</span>.<br>
@@ -88,7 +118,7 @@ CoNBoVal-XAS<br>
 </span></span>
 <h2><span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">Acknowledgement</span></span></span></h2>
 <h2><span style="font-family: Arial;"><span style="font-family: Courier New;"></span></span></h2>
-<span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;">&nbsp;</span><span style="font-family: Arial;">This
+<span style="font-family: Arial;"><span style="font-family: Courier New;"><span style="font-family: Arial;"></span><span style="font-family: Arial;">This
 work was developed in SESAME and funded under the LinkSCEEM-2 project
 under Grant Agreement 261600 of the 7th framework program for
 research (FP7)</span>.<br>
@@ -104,4 +134,5 @@ research (FP7)</span>.<br>
 <br>
 
 <br>
+
 </body></html>
