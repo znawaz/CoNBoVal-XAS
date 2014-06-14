@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
   
@@ -77,26 +76,7 @@ bond valence (default = "_bondVal.txt")</span><br>
 <span style="font-family: Arial;">Results are stored in <span style="font-family: Courier New;">prefixnnnnn.inp, prefix_bondValence.txt</span> and <span style="font-family: Courier New;">prefix_feffscript.make</span> files. Where <span style="font-family: Courier New;">nnnnn</span> represent the line number of the query atom in the list and <span style="font-family: Courier New;">bondValence</span> is suffix name of bond valence file as given in the argument. The file <span style="font-family: Courier New;">prefixnnnnn.inp</span> is the input to feff software. The file <span style="font-family: Courier New;">prefix_bondValence.txt </span>contains the coordination number and the bond valence of the coordination atom. The last file <span style="font-family: Courier New;">prefix_feffscript.make</span> contains the linux bash commands to prepare the input file <span style="font-family: Courier New;">prefixnnnnn.inp</span> for the feff software.</span><br style="font-family: Arial;">
 <meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8"><title></title><meta name="GENERATOR" content="LibreOffice 3.5  (Linux)">
 	
-	
-	<style type="text/css">
-	<!--
-		@page { margin: 0.79in }
-		H2.ls-body-western { font-size: 12pt; so-language: en-GB; font-weight: normal; page-break-after: auto }
-		H2.ls-body-cjk { font-size: 12pt; so-language: en-US; font-weight: normal; page-break-after: auto }
-		H2.ls-body-ctl { font-family: "Arial"; font-size: 12pt; so-language: hi-IN; font-weight: normal; page-break-after: auto }
-		H2 { margin-left: 0.25in; text-indent: -0.25in; margin-top: 0.02in; margin-bottom: 0.02in; direction: ltr; color: #000000; text-align: justify; widows: 0; orphans: 0 }
-		H2.western { font-family: "Arial", serif; font-size: 12pt; so-language: en-GB; font-weight: normal }
-		H2.cjk { font-size: 12pt; so-language: en-US; font-weight: normal }
-		H2.ctl { font-family: "Arial"; font-size: 12pt; so-language: hi-IN; font-weight: normal }
-		P { margin-bottom: 0.08in; direction: ltr; color: #000000; widows: 0; orphans: 0 }
-		P.western { font-family: "Arial", serif; font-size: 11pt; so-language: en-GB }
-		P.cjk { font-family: "DejaVu Sans"; font-size: 11pt; so-language: ar-SA }
-		P.ctl { font-family: "FreeSans"; font-size: 12pt; so-language: hi-IN }
-		A:link { color: #0000ff }
-		A.western:link { so-language: zxx }
-		A.cjk:link { so-language: zxx }
-		A.ctl:link { font-family: "Times New Roman"; so-language: zxx }
-	--></style><br>
+		
 <span style="font-family: Arial;">
 <br><span style="font-weight: bold;">
 Example:&nbsp;</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
